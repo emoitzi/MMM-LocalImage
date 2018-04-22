@@ -1,0 +1,13 @@
+.localimage-wrapper {
+  position: relative;
+}
+
+img.localimage {
+  object-fit: contain;
+  width: 100%;
+  align-content: center;
+  opacity: 0.9;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
