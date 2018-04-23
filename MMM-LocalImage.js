@@ -9,7 +9,7 @@ Module.register("MMM-LocalImage",{
 
 	visible: null,
 	invisible: null,
-	animation: 'animate',
+	animation: 'transition',
 
 	initialize: {
 		'show': function(self) {
@@ -17,6 +17,10 @@ Module.register("MMM-LocalImage",{
 		},
 		'animate': function(self) {
 			self.invisible.attr('style','opacity: 0');
+		},
+		'transition': function(self) {
+			self.invisible.className += 'invisible';
+			self.visible.className += 'visible';
 		}
 	},
 
@@ -33,6 +37,13 @@ Module.register("MMM-LocalImage",{
 			self.visible.animate({ opacity: 0}, 1000);
 			callback();
 
+		},
+		'transition': function(self, callback) {
+			self.invisible.removeClass('invisible');
+			self.invisible.addClass('visible');
+			self.visible.removeClass('visible');
+			self.visible.addClass('invisible');
+			callback();
 		}
 	},
 
@@ -61,21 +72,22 @@ Module.register("MMM-LocalImage",{
 
   getImage: function() {
     var self = this;
-    if (! this.images) {
+    if (! this.images.length) {
 			console.log('No images!');
       return '';
     }
 		console.log('getImage()');
 
     var image = this.file(this.images[this.current_index++ % this.images.length]);
-    this.invisible.attr('src', image)
-                         .one('load', function() {
-													 self.animations[self.animation](self, () => {
-														 var temp = self.visible;
-														 self.visible = self.invisible;
-														 self.invisible = temp;
-													 });
-                         });
+    $('<img/>').attr('src', image).on('load', function() {
+      $(this).remove();
+      self.invisible.attr('style', 'background-image: url("' + image + '")');
+      self.animations[self.animation](self, () => {
+        var temp = self.visible;
+        self.visible = self.invisible;
+        self.invisible = temp;
+      });
+    });
 
     setTimeout(function() {
 			self.getImage();
@@ -83,17 +95,17 @@ Module.register("MMM-LocalImage",{
   },
 
 	// Override dom generator.
-	getDom: function() {
-		var wrapper = document.createElement("div");
-    wrapper.innerHTML = '<img id="localimage1" class="localimage" /><img id="localimage2"class="localimage" />';
-		wrapper.className += 'localimage-wrapper';
-		this.invisible = $(wrapper).find('#localimage1');
-		this.visible = $(wrapper).find('#localimage2');
+  getDom: function() {
+    var wrapper = document.createElement("div");
+    wrapper.innerHTML = '<div id="localimage1" class="localimage" ></div><div id="localimage2"class="localimage"></div>';
+    wrapper.className += 'localimage-wrapper';
+    this.invisible = $(wrapper).find('#localimage1');
+    this.visible = $(wrapper).find('#localimage2');
 
-		this.initialize[this.animation](this);
+    this.initialize[this.animation](this);
 
-		return wrapper;
-	},
+    return wrapper;
+  },
   getScripts: function() {
     return [
 			this.file('node_modules/jquery/dist/jquery.min.js')
