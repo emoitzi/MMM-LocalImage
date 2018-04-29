@@ -80,6 +80,12 @@ Module.register("MMM-LocalImage",{
 
     var image = this.file(this.images[this.current_index++ % this.images.length]);
     $('<img/>').attr('src', image).on('load', function() {
+      if (this.width > this.height) {
+        self.invisible.addClass('cover');
+      }
+      else {
+        self.invisible.removeClass('cover');
+      }
       $(this).remove();
       self.invisible.attr('style', 'background-image: url("' + image + '")');
       self.animations[self.animation](self, () => {
