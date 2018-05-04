@@ -29,15 +29,19 @@ module.exports = NodeHelper.create({
             results.push(dir + '/' +  file);
           }
       });
-      setTimeout( () => {
-        self._getAllFilesFromFolder(dir, callback);
-
-      }, self.refresh * 1000)
       callback(results);
     });
   },
   getImages: function() {
   	this.sendSocketNotification("IMAGES", this.images);
+    setTimeout( () => {
+      self._getAllFilesFromFolder(dir, function(files) {
+        self.images =  images;
+        self.getImages();
+      });
+
+    }, self.refresh * 1000);
+
   },
 
   start: function() {

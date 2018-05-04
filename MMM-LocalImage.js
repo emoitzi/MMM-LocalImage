@@ -57,6 +57,7 @@ Module.register("MMM-LocalImage",{
   // Subclass socketNotificationReceived received.
 	socketNotificationReceived: function(notification, payload) {
 		if (notification === "IMAGES" && payload) {
+			self.sendNotification("SHOW_ALERT", {type: "notification", title: "Images", "message": "Images updated."});
       Log.info('Images: ' + payload);
       this.images = payload;
       this.getImage();
